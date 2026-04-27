@@ -58,7 +58,10 @@ public class TaskItemService : ITaskItemService
         if (existing is null)
             throw new NotFoundException(nameof(TaskItem), id);
 
-        var updated = existing.WithStatut(request.Statut).WithTitre(request.Titre);
+        var updated = existing;
+        if (request.Titre is not null) updated = updated.WithTitre(request.Titre);
+        if (request.Statut is not null) updated = updated.WithStatut(request.Statut);
+
         var saved = await _repository.UpdateAsync(updated);
         return _mapper.Map<TaskItemResponse>(saved);
     }
