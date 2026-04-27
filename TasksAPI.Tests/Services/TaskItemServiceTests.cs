@@ -117,4 +117,44 @@ public class TaskItemServiceTests
         result.Items.Should().BeEmpty();
         result.TotalCount.Should().Be(0);
     }
+
+    // Issue #2 - GET /tasks : chaque tache doit contenir id, titre, statut
+    [Test]
+    public async Task GetAllAsync_should_return_tasks_with_id_titre_statut_fields()
+    {
+        var tasks = new List<TaskItem>
+        {
+            new TaskItem("Tache A", "todo"),
+            new TaskItem("Tache B", "done")
+        };
+        _repositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(tasks);
+
+        var result = await _service.GetAllAsync(1, 10);
+
+        result.Items.Should().NotBeEmpty();
+        foreach (var item in result.Items)
+        {
+            item.Titre.Should().NotBeNullOrEmpty();
+            item.Statut.Should().NotBeNullOrEmpty();
+        }
+        result.Items.Should().Contain(t => t.Titre == "Tache A" && t.Statut == "todo");
+        result.Items.Should().Contain(t => t.Titre == "Tache B" && t.Statut == "done");
+    }
+
+    // Issue #2 - GET /tasks : retourne 200 (ApiResponse wrapping) avec la liste
+    [Test]
+    public async Task GetAllAsync_should_return_paged_result_with_correct_pagination_metadata()
+    {
+        var tasks = Enumerable.Range(1, 15)
+            .Select(i => new TaskItem($"Tache {i}", "todo"))
+            .ToList();
+        _repositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(tasks);
+
+        var result = await _service.GetAllAsync(2, 5);
+
+        result.Page.Should().Be(2);
+        result.PageSize.Should().Be(5);
+        result.TotalCount.Should().Be(15);
+        result.Items.Should().HaveCount(5);
+    }
 }
