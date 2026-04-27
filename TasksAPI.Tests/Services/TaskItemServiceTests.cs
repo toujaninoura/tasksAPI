@@ -132,6 +132,34 @@ public class TaskItemServiceTests
         result.TotalCount.Should().Be(0);
     }
 
+    // Issue #4 - POST /tasks : statut par defaut "todo" si non fourni
+    [Test]
+    public async Task CreateAsync_should_default_statut_to_todo_when_not_provided()
+    {
+        var request = new CreateTaskItemRequest { Titre = "Tache sans statut" };
+        var task = new TaskItem("Tache sans statut", "todo") { Id = 5 };
+        _repositoryMock.Setup(r => r.AddAsync(It.IsAny<TaskItem>())).ReturnsAsync(task);
+
+        var result = await _service.CreateAsync(request);
+
+        result.Statut.Should().Be("todo");
+    }
+
+    // Issue #4 - POST /tasks : retourne la tache creee avec id, titre, statut
+    [Test]
+    public async Task CreateAsync_should_return_created_task_with_all_fields()
+    {
+        var request = new CreateTaskItemRequest { Titre = "Ma tache", Statut = "in-progress" };
+        var task = new TaskItem("Ma tache", "in-progress") { Id = 10 };
+        _repositoryMock.Setup(r => r.AddAsync(It.IsAny<TaskItem>())).ReturnsAsync(task);
+
+        var result = await _service.CreateAsync(request);
+
+        result.Id.Should().Be(10);
+        result.Titre.Should().Be("Ma tache");
+        result.Statut.Should().Be("in-progress");
+    }
+
     // Issue #2 - GET /tasks : chaque tache doit contenir id, titre, statut
     [Test]
     public async Task GetAllAsync_should_return_tasks_with_id_titre_statut_fields()
