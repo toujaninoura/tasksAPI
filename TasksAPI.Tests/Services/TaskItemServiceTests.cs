@@ -70,6 +70,20 @@ public class TaskItemServiceTests
     }
 
     [Test]
+    public async Task GetByIdAsync_should_return_task_with_all_fields()
+    {
+        var task = new TaskItem("Tache detail", "in-progress") { Id = 42 };
+        _repositoryMock.Setup(r => r.GetByIdAsync(42)).ReturnsAsync(task);
+
+        var result = await _service.GetByIdAsync(42);
+
+        result.Should().NotBeNull();
+        result!.Id.Should().Be(42);
+        result.Titre.Should().Be("Tache detail");
+        result.Statut.Should().Be("in-progress");
+    }
+
+    [Test]
     public async Task CreateAsync_should_return_created_task_when_valid_request()
     {
         var request = new CreateTaskItemRequest { Titre = "Nouvelle tache", Statut = "todo" };
