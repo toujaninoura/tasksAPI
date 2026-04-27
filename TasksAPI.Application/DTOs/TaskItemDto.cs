@@ -15,6 +15,6 @@ public class CreateTaskItemRequest
 
 public class UpdateTaskItemRequest
 {
-    public string Titre { get; init; } = string.Empty;
-    public string Statut { get; init; } = string.Empty;
+    public string? Titre { get; init; }
+    public string? Statut { get; init; }
 }

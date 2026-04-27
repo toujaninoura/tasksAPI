@@ -160,6 +160,38 @@ public class TaskItemServiceTests
         result.Statut.Should().Be("in-progress");
     }
 
+    // Issue #5 - PUT /tasks/{id} : mise a jour partielle du titre uniquement
+    [Test]
+    public async Task UpdateAsync_should_update_only_titre_when_statut_not_provided()
+    {
+        var existing = new TaskItem("Ancien titre", "todo") { Id = 1 };
+        var saved = new TaskItem("Nouveau titre", "todo") { Id = 1 };
+        _repositoryMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(existing);
+        _repositoryMock.Setup(r => r.UpdateAsync(It.IsAny<TaskItem>())).ReturnsAsync(saved);
+
+        var request = new UpdateTaskItemRequest { Titre = "Nouveau titre" };
+        var result = await _service.UpdateAsync(1, request);
+
+        result.Titre.Should().Be("Nouveau titre");
+        result.Statut.Should().Be("todo");
+    }
+
+    // Issue #5 - PUT /tasks/{id} : mise a jour partielle du statut uniquement
+    [Test]
+    public async Task UpdateAsync_should_update_only_statut_when_titre_not_provided()
+    {
+        var existing = new TaskItem("Mon titre", "todo") { Id = 2 };
+        var saved = new TaskItem("Mon titre", "done") { Id = 2 };
+        _repositoryMock.Setup(r => r.GetByIdAsync(2)).ReturnsAsync(existing);
+        _repositoryMock.Setup(r => r.UpdateAsync(It.IsAny<TaskItem>())).ReturnsAsync(saved);
+
+        var request = new UpdateTaskItemRequest { Statut = "done" };
+        var result = await _service.UpdateAsync(2, request);
+
+        result.Titre.Should().Be("Mon titre");
+        result.Statut.Should().Be("done");
+    }
+
     // Issue #2 - GET /tasks : chaque tache doit contenir id, titre, statut
     [Test]
     public async Task GetAllAsync_should_return_tasks_with_id_titre_statut_fields()

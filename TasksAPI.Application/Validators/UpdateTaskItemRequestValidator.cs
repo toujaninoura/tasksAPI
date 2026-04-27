@@ -9,13 +9,22 @@ public class UpdateTaskItemRequestValidator : AbstractValidator<UpdateTaskItemRe
 
     public UpdateTaskItemRequestValidator()
     {
-        RuleFor(x => x.Titre)
-            .NotEmpty().WithMessage("Le titre est obligatoire.")
-            .MaximumLength(200).WithMessage("Le titre ne peut pas dépasser 200 caractères.");
+        RuleFor(x => x)
+            .Must(x => x.Titre is not null || x.Statut is not null)
+            .WithMessage("Au moins un champ (titre ou statut) doit être fourni.");
 
-        RuleFor(x => x.Statut)
-            .NotEmpty().WithMessage("Le statut est obligatoire.")
-            .Must(s => ValidStatuts.Contains(s))
-            .WithMessage($"Le statut doit être l'une des valeurs suivantes : {string.Join(", ", ValidStatuts)}.");
+        When(x => x.Titre is not null, () =>
+        {
+            RuleFor(x => x.Titre)
+                .NotEmpty().WithMessage("Le titre ne peut pas être vide.")
+                .MaximumLength(100).WithMessage("Le titre ne peut pas dépasser 100 caractères.");
+        });
+
+        When(x => x.Statut is not null, () =>
+        {
+            RuleFor(x => x.Statut)
+                .Must(s => ValidStatuts.Contains(s))
+                .WithMessage($"Le statut doit être l'une des valeurs suivantes : {string.Join(", ", ValidStatuts)}.");
+        });
     }
 }
