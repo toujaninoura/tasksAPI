@@ -60,12 +60,12 @@ public class TaskItemsController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int id)
     {
         _logger.LogInformation("Deleting task id: {Id}", id);
         await _service.DeleteAsync(id);
-        return Ok(ApiResponse<object>.Ok(new { }, "Tache supprimee avec succes."));
+        return NoContent();
     }
 }
