@@ -192,6 +192,20 @@ public class TaskItemServiceTests
         result.Statut.Should().Be("done");
     }
 
+    // Issue #6 - DELETE /tasks/{id} : suppression reussie (204 No Content)
+    [Test]
+    public async Task DeleteAsync_should_succeed_when_task_exists()
+    {
+        var existing = new TaskItem("A supprimer", "todo") { Id = 3 };
+        _repositoryMock.Setup(r => r.GetByIdAsync(3)).ReturnsAsync(existing);
+        _repositoryMock.Setup(r => r.DeleteAsync(3)).Returns(Task.CompletedTask);
+
+        Func<Task> act = async () => await _service.DeleteAsync(3);
+
+        await act.Should().NotThrowAsync();
+        _repositoryMock.Verify(r => r.DeleteAsync(3), Times.Once);
+    }
+
     // Issue #2 - GET /tasks : chaque tache doit contenir id, titre, statut
     [Test]
     public async Task GetAllAsync_should_return_tasks_with_id_titre_statut_fields()
