@@ -11,7 +11,7 @@ public class CreateTaskItemRequestValidator : AbstractValidator<CreateTaskItemRe
     {
         RuleFor(x => x.Titre)
             .NotEmpty().WithMessage("Le titre est obligatoire.")
-            .MaximumLength(200).WithMessage("Le titre ne peut pas dépasser 200 caractères.");
+            .MaximumLength(100).WithMessage("Le titre ne peut pas dépasser 100 caractères.");
 
         RuleFor(x => x.Statut)
             .Must(s => ValidStatuts.Contains(s))

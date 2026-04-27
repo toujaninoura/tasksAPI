@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace TasksAPI.Application.DTOs;
 
 public class TaskItemResponse
@@ -9,6 +11,8 @@ public class TaskItemResponse
 
 public class CreateTaskItemRequest
 {
+    [Required(ErrorMessage = "Le titre est obligatoire.")]
+    [MaxLength(100, ErrorMessage = "Le titre ne peut pas dépasser 100 caractères.")]
     public string Titre { get; init; } = string.Empty;
     public string Statut { get; init; } = "todo";
 }
